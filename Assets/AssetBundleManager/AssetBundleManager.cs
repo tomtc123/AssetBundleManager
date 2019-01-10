@@ -455,7 +455,7 @@ namespace AssetBundles
             }
             else
             {
-                WWW download = null;
+                UnityEngine.Networking.UnityWebRequest download = null;
 
                 if (!bundleBaseDownloadingURL.EndsWith("/"))
                 {
@@ -466,9 +466,9 @@ namespace AssetBundles
 
                 // For manifest assetbundle, always download it as we don't have hash for it.
                 if (isLoadingAssetBundleManifest)
-                    download = new WWW(url);
+                    download = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(url);
                 else
-                    download = WWW.LoadFromCacheOrDownload(url, m_AssetBundleManifest.GetAssetBundleHash(assetBundleName), 0);
+                    download = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(url, m_AssetBundleManifest.GetAssetBundleHash(assetBundleName), 0);
 
                 m_InProgressOperations.Add(new AssetBundleDownloadFromWebOperation(assetBundleName, download));
             }

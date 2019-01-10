@@ -6,6 +6,7 @@ using UnityEngine.iOS;
 using System.Collections;
 
 using UnityEditor.SceneManagement;
+using UnityEngine.Networking;
 
 namespace AssetBundles
 {
@@ -148,34 +149,34 @@ namespace AssetBundles
 
     public class AssetBundleDownloadFromWebOperation : AssetBundleDownloadOperation
     {
-        WWW m_WWW;
+        UnityWebRequest m_WebRequest;
         string m_Url;
 
-        public AssetBundleDownloadFromWebOperation(string assetBundleName, WWW www)
+        public AssetBundleDownloadFromWebOperation(string assetBundleName, UnityWebRequest webRequest)
             : base(assetBundleName)
         {
-            if (www == null)
-                throw new System.ArgumentNullException("www");
-            m_Url = www.url;
-            this.m_WWW = www;
+            if (webRequest == null)
+                throw new System.ArgumentNullException("UnityWebRequest");
+            m_Url = webRequest.url;
+            this.m_WebRequest = webRequest;
         }
 
-        protected override bool downloadIsDone { get { return (m_WWW == null) || m_WWW.isDone; } }
+        protected override bool downloadIsDone { get { return (m_WebRequest == null) || m_WebRequest.isDone; } }
 
         protected override void FinishDownload()
         {
-            error = m_WWW.error;
+            error = m_WebRequest.error;
             if (!string.IsNullOrEmpty(error))
                 return;
 
-            AssetBundle bundle = m_WWW.assetBundle;
+            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(m_WebRequest);
             if (bundle == null)
                 error = string.Format("{0} is not a valid asset bundle.", assetBundleName);
             else
-                assetBundle = new LoadedAssetBundle(m_WWW.assetBundle);
+                assetBundle = new LoadedAssetBundle(bundle);
 
-            m_WWW.Dispose();
-            m_WWW = null;
+            m_WebRequest.Dispose();
+            m_WebRequest = null;
         }
 
         public override string GetSourceURL()
