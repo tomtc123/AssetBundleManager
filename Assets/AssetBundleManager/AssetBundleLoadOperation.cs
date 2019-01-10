@@ -161,6 +161,7 @@ namespace AssetBundles
                 throw new System.ArgumentNullException("UnityWebRequest");
             m_Url = webRequest.url;
             this.m_WebRequest = webRequest;
+            this.m_WebRequest.SendWebRequest();
         }
 
         protected override bool downloadIsDone { get { return (m_WebRequest == null) || m_WebRequest.isDone; } }

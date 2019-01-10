@@ -107,11 +107,19 @@ namespace AssetBundles
 
         static string GetMonoProfileVersion()
         {
+#if UNITY_EDITOR_OSX
+            return "4.7.1";
+#else
             string path = Path.Combine(Path.Combine(MonoInstallationFinder.GetMonoInstallation("MonoBleedingEdge"), "lib"), "mono");
 
             string[] folders = Directory.GetDirectories(path);
+
             string[] foldersWithApi = folders.Where(f => f.Contains("-api")).ToArray();
             float profileVersion = 1.0f;
+            foreach (var item in foldersWithApi)
+            {
+                UnityEngine.Debug.Log(item);
+            }
 
             for (int i = 0; i < foldersWithApi.Length; i++)
             {
@@ -125,6 +133,7 @@ namespace AssetBundles
             }
 
             return profileVersion.ToString();
+#endif
         }
     }
 }
