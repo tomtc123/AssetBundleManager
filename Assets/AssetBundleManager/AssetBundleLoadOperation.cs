@@ -1,11 +1,11 @@
 using UnityEngine;
-#if UNITY_5_3 || UNITY_5_4
 using UnityEngine.SceneManagement;
-#endif
 #if ENABLE_IOS_ON_DEMAND_RESOURCES
 using UnityEngine.iOS;
 #endif
 using System.Collections;
+
+using UnityEditor.SceneManagement;
 
 namespace AssetBundles
 {
@@ -202,9 +202,9 @@ namespace AssetBundles
             }
 
             if (isAdditive)
-                m_Operation = UnityEditor.EditorApplication.LoadLevelAdditiveAsyncInPlayMode(levelPaths[0]);
+                m_Operation = EditorSceneManager.LoadSceneAsyncInPlayMode(levelPaths[0], new LoadSceneParameters(LoadSceneMode.Additive, LocalPhysicsMode.None));
             else
-                m_Operation = UnityEditor.EditorApplication.LoadLevelAsyncInPlayMode(levelPaths[0]);
+                m_Operation = EditorSceneManager.LoadSceneAsyncInPlayMode(levelPaths[0], new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
         }
 
         public override bool Update()
@@ -242,14 +242,8 @@ namespace AssetBundles
             LoadedAssetBundle bundle = AssetBundleManager.GetLoadedAssetBundle(m_AssetBundleName, out m_DownloadingError);
             if (bundle != null)
             {
-#if UNITY_5_3 || UNITY_5_4
                 m_Request = SceneManager.LoadSceneAsync(m_LevelName, m_IsAdditive ? LoadSceneMode.Additive : LoadSceneMode.Single);
-#else
-                if (m_IsAdditive)
-                    m_Request = Application.LoadLevelAdditiveAsync(m_LevelName);
-                else
-                    m_Request = Application.LoadLevelAsync(m_LevelName);
-#endif
+
                 return false;
             }
             else
