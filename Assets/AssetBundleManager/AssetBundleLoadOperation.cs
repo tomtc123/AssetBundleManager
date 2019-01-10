@@ -4,9 +4,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.iOS;
 #endif
 using System.Collections;
-
-using UnityEditor.SceneManagement;
 using UnityEngine.Networking;
+
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace AssetBundles
 {
