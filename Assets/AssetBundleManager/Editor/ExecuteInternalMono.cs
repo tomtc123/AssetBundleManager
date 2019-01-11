@@ -51,9 +51,7 @@ namespace AssetBundles
 
     class ExecuteInternalMono
     {
-#if !UNITY_STANDALONE_OSX
-        private static readonly Regex UnsafeCharsWindows = new Regex("[^A-Za-z0-9\\_\\-\\.\\:\\,\\/\\@\\\\]");
-#endif
+        private static readonly Regex UnsafeCharsWindows = new Regex("[^A-Za-z0-9\\-\\.\\:\\,\\/\\@\\\\]");
         private static readonly Regex UnescapeableChars = new Regex("[\\x00-\\x08\\x10-\\x1a\\x1c-\\x1f\\x7f\\xff]");
         private static readonly Regex Quotes = new Regex("\"");
 
@@ -92,12 +90,10 @@ namespace AssetBundles
                 UnityEngine.Debug.LogWarning("Cannot escape control characters in string");
                 return "\"\"";
             }
-#if !UNITY_EDITOR_OSX
             if (UnsafeCharsWindows.IsMatch(input))
             {
                 return "\"" + Quotes.Replace(input, "\"\"") + "\"";
             }
-#endif
             return input;
         }
 
