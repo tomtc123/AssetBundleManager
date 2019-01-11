@@ -70,5 +70,18 @@ namespace AssetBundles
                     return null;
             }
         }
+
+        public static string GetStreamingAssetPath(bool isFileProtocol = false)
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    return (isFileProtocol ? "jar:file://" : "") + Application.dataPath + "!/assets/";
+                case RuntimePlatform.IPhonePlayer:
+                    return (isFileProtocol ? "file://" : "") + Application.dataPath + "/Raw/";
+                default:
+                    return (isFileProtocol ? "file://" : "") + Application.dataPath + "/StreamingAssets/";
+            }
+        }
     }
 }

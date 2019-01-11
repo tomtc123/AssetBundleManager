@@ -49,16 +49,17 @@ namespace AssetBundles
                 options |= BuildAssetBundleOptions.UncompressedAssetBundle;
 #endif
             }
-
+            AssetBundleManifest manifest = null;
             if (builds == null || builds.Length == 0)
             {
                 //@TODO: use append hash... (Make sure pipeline works correctly with it.)
-                BuildPipeline.BuildAssetBundles(outputPath, options, EditorUserBuildSettings.activeBuildTarget);
+                manifest = BuildPipeline.BuildAssetBundles(outputPath, options, EditorUserBuildSettings.activeBuildTarget);
             }
             else
             {
-                BuildPipeline.BuildAssetBundles(outputPath, builds, options, EditorUserBuildSettings.activeBuildTarget);
+                manifest = BuildPipeline.BuildAssetBundles(outputPath, builds, options, EditorUserBuildSettings.activeBuildTarget);
             }
+            WriteAssetBundleVersion(outputPath, manifest);
         }
 
         public static void WriteServerURL()
@@ -220,6 +221,29 @@ namespace AssetBundles
         {
             var relativeAssetBundlesOutputPathForPlatform = Path.Combine(Utility.AssetBundlesOutputPath, Utility.GetPlatformName());
             return Path.Combine(relativeAssetBundlesOutputPathForPlatform,  Utility.GetPlatformName()) + ".manifest";
+        }
+
+        static long GetAssetBundleFileSize(string path)
+        {
+            var fileInfo = new FileInfo(path);
+            if (fileInfo != null)
+            {
+                return fileInfo.Length;
+            }
+            return 0;
+        }
+
+        static void WriteAssetBundleVersion(string outPutPath, AssetBundleManifest manifest)
+        {
+            string[] allAssetsBundles = manifest.GetAllAssetBundles();
+            string versions = string.Empty;
+            foreach(var assetBundleName in allAssetsBundles)
+            {
+                Hash128 hash = manifest.GetAssetBundleHash(assetBundleName);
+                long size = GetAssetBundleFileSize(Path.Combine(outPutPath, assetBundleName));
+                versions += string.Format("{0},{1},{2}\n", assetBundleName, hash, size);
+            }
+            File.WriteAllText(Path.Combine(outPutPath, "AssetBundleVersion.bytes"), versions);
         }
     }
 }
