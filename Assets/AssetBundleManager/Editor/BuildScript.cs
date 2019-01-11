@@ -59,6 +59,7 @@ namespace AssetBundles
             {
                 manifest = BuildPipeline.BuildAssetBundles(outputPath, builds, options, EditorUserBuildSettings.activeBuildTarget);
             }
+            WriteServerURL();
             WriteAssetBundleVersion(outputPath, manifest);
         }
 

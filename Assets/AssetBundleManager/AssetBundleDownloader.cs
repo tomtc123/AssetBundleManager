@@ -52,10 +52,17 @@ namespace AssetBundles {
             string versionText = DownloadHandlerBuffer.GetContent(request);
             streamingVersion = GetAssetBundleVersion(versionText, LoaderSpace.Streaming);
 
+            print(Application.persistentDataPath);
+            print(GetVersionFileUrl(LoaderSpace.Persistent));
             request = UnityWebRequest.Get(GetVersionFileUrl(LoaderSpace.Persistent));
             yield return request.SendWebRequest();
-            versionText = DownloadHandlerBuffer.GetContent(request);
-            persistentVersion = GetAssetBundleVersion(versionText, LoaderSpace.Persistent);
+            print(request.error);
+            if (string.IsNullOrEmpty(request.error))
+            {
+                versionText = DownloadHandlerBuffer.GetContent(request);
+                print(versionText);
+                persistentVersion = GetAssetBundleVersion(versionText, LoaderSpace.Persistent);
+            }
 
             AssetBundleManager.SetDevelopmentAssetBundleServer();
 
@@ -68,10 +75,13 @@ namespace AssetBundles {
             DownloadTotalSize = 0;
             foreach (var item in serverVersion)
             {
-                if (persistentVersion.ContainsKey(item.Key) && !string.Equals(item.Value.hash, persistentVersion[item.Key].hash))
+                if (persistentVersion.ContainsKey(item.Key))
                 {
-                    DownloadTotalSize += item.Value.size;
-                    mDownloadAssetBundleVersion.Add(item.Value);
+                    if (!string.Equals(item.Value.hash, persistentVersion[item.Key].hash))
+                    {
+                        DownloadTotalSize += item.Value.size;
+                        mDownloadAssetBundleVersion.Add(item.Value);
+                    }
                 }
                 else
                 {
@@ -116,6 +126,13 @@ namespace AssetBundles {
             {
                 finishedCallback(DownloadTotalSize);
             }
+            string versions = "";
+            foreach (var item in persistentVersion)
+            {
+                versions += string.Format("{0},{1},{2}\n", item.Key, item.Value.hash, item.Value.size);
+            }
+            //File.WriteAllText(Path.Combine(Application.persistentDataPath, "AssetBundleVersion.bytes"), versions);
+
         }
 
         public string GetVersionFileUrl(LoaderSpace loaderspace)
@@ -125,7 +142,7 @@ namespace AssetBundles {
                 case LoaderSpace.Streaming:
                     return Path.Combine(Utility.GetStreamingAssetPath(true), assetBundleVersionFileName);
                 case LoaderSpace.Persistent:
-                    return Path.Combine("file:///", Application.persistentDataPath, assetBundleVersionFileName);
+                    return Path.Combine(Utility.GetPlatformPrefix(Application.platform), Application.persistentDataPath, assetBundleVersionFileName);
                 default:
                     return Path.Combine(AssetBundleManager.BaseDownloadingURL, assetBundleVersionFileName);
             }

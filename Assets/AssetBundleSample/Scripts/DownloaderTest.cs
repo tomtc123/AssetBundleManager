@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIConfirmDownload : MonoBehaviour
+public class DownloaderTest : MonoBehaviour
 {
     public Text label;
-
+    public Slider slider;
+    public Text sliderText;
     
     IEnumerator Start()
     {
@@ -17,10 +18,17 @@ public class UIConfirmDownload : MonoBehaviour
 
     public void OnClickDownload()
     {
-        StartCoroutine(AssetBundles.AssetBundleDownloader.Instance.DownloadAsync((long cursize, long totalsize)=>
+        StartCoroutine(AssetBundles.AssetBundleDownloader.Instance.DownloadAsync(
+        (long cursize, long totalsize)=>
         {
+            slider.value = cursize / (totalsize * 1.0f);
+            sliderText.text = string.Format("{0:N2}%", 100 * cursize / (totalsize * 1.0f));
             Debug.LogFormat("downloaded size={0}, total size={1}", cursize, totalsize);
-        }, null));
+        }, 
+        (long size) =>
+        {
+            label.text = "Download finished.";
+        }));
     }
 
     public static string FormatSize(long byteCount)

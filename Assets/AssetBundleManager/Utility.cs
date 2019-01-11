@@ -83,5 +83,23 @@ namespace AssetBundles
                     return (isFileProtocol ? "file://" : "") + Application.dataPath + "/StreamingAssets/";
             }
         }
+
+        public static string GetPlatformPrefix(RuntimePlatform platform)
+        {
+            switch(platform)
+            {
+                case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXPlayer:
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                    return "file:///";
+                case RuntimePlatform.IPhonePlayer:
+                    return "file://";
+                case RuntimePlatform.Android:
+                    return "";
+                default:
+                    return "";
+            }
+       }
     }
 }
